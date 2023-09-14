@@ -18,4 +18,8 @@ class Product extends Model
         'image',
     ];
 
+    public function shoppingCarts () {
+        return $this->hasMany(ShoppingCart::class, 'product_id');
+    }
+
 }

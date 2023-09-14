@@ -95,6 +95,7 @@ class ProductController extends Controller
         $dto = ProductDestroyDTO::fromRequest($request)->validatedData;
         $destroy = Product::findOrFail($dto['id']);
         $this->deleteImage($destroy->image);
+        $destroy->shoppingCarts()->delete();
         $destroy->delete();
         return responseJsonSuccess();
     }
