@@ -16,8 +16,8 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->input('token') !== 'my-secret-token') {
-            return response()->json(['messgae' => ''], 403);
+        if (auth()->user()->is_admin == 0) {
+            return responseJson(['messgae' => 'You do not have access permission.'], 403);
         }
 
         return $next($request);

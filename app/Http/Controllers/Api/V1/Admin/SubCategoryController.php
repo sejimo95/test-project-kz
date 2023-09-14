@@ -2,21 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\DTOs\Admin\SubCategoryDestroyDTO;
+use App\DTOs\Admin\SubCategoryDTO;
 use App\Http\Controllers\Controller;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
 class SubCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -25,30 +18,9 @@ class SubCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+        $dto = SubCategoryDTO::fromRequest($request)->validatedData;
+        SubCategory::create($dto);
+        return responseJsonSuccess();
     }
 
     /**
@@ -57,8 +29,11 @@ class SubCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        requestAddParam('sub_category');
+        $dto = SubCategoryDestroyDTO::fromRequest($request)->validatedData;
+        SubCategory::findOrFail($dto['id'])->delete();
+        return responseJsonSuccess();
     }
 }

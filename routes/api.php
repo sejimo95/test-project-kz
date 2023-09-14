@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\User\ProductController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::prefix('v1')->group(function () {
 
     // auth
@@ -16,14 +17,21 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth')->group(function () {
         // user
         Route::prefix('user')->group(function () {
-            Route::post('product', [ProductController::class, 'me']);
+            Route::post('product', [ProductController::class, 'index']);
 
         });
 
         // admin
-        Route::prefix('admin')->middleware('IsAdmin')->group(function () {
-
-        });
+        Route::prefix('admin')
+            ->namespace('App\Http\Controllers\Api\V1\Admin')
+            ->middleware('IsAdmin')
+            ->group(function () {
+                Route::apiResource('product', 'ProductController');
+                Route::apiResource('category', 'CategoryController')
+                    ->only(['index', 'store', 'destroy']);
+                Route::apiResource('sub_category', 'SubCategoryController')
+                    ->only(['store', 'destroy']);
+            });
     });
 
 });

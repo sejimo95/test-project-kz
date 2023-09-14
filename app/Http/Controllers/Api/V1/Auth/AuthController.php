@@ -15,8 +15,9 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $dto = LoginDTO::fromRequest($request);
-        if (! $token = auth()->attempt($dto->validatedData)) {
+        $dto = LoginDTO::fromRequest($request)->validatedData;
+
+        if (! $token = auth()->attempt($dto)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
