@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\DTOs\Admin\ProductDestroyDTO;
 use App\DTOs\Admin\ProductDTO;
+use App\DTOs\Admin\ProductUpdateDTO;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -17,8 +19,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::oldest();
-        return responseJson(['date' => $query->paginate(10)],200);
+        $query = Product::oldest()
+            ->paginate(10);
+        return responseJson(['date' => $query],200);
     }
 
     /**
@@ -29,9 +32,22 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $dto = $this->validationDTO($request);
-        Product::create($dto);
-        return responseJson([],200);
+        $dto = ProductDTO::fromRequest($request)->validatedData;
+
+        $image = '';
+        if ($request->hasFile('image')) {
+            $image = $request->file('image')->store('product');
+        }
+
+        Product::create([
+            'title' => $dto['title'],
+            'price' => $dto['price'],
+            'image' => $image,
+            'description' => $dto['description'],
+            'available' => $dto['available'],
+        ]);
+
+        return responseJsonSuccess();
     }
 
     /**
@@ -43,10 +59,28 @@ class ProductController extends Controller
      */
     public function update(Request $request)
     {
-        $dto = $this->validationDTO($request);
-        $update = Product::findOrFail($dto->id);
-        $update->update($dto);
-        return responseJson([],200);
+        // validation
+        requestAddParam('product');
+        $dto = ProductUpdateDTO::fromRequest($request)->validatedData;
+        $update = Product::findOrFail($dto['id']);
+
+        // check has image
+        $image = $update->image;
+        if ($request->hasFile('image')) {
+            $this->deleteImage($image);
+            $image = $request->file('image')->store('product');
+        }
+
+        // update
+        $update->update([
+            'title' => $dto['title'],
+            'price' => $dto['price'],
+            'image' => $image,
+            'description' => $dto['description'],
+            'available' => $dto['available'],
+        ]);
+
+        return responseJsonSuccess();
     }
 
     /**
@@ -55,15 +89,18 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $destroy = Product::findOrFail($id);
-        Storage::delete($destroy->image);
+        requestAddParam('product');
+        $dto = ProductDestroyDTO::fromRequest($request)->validatedData;
+        $destroy = Product::findOrFail($dto['id']);
+        $this->deleteImage($destroy->image);
         $destroy->delete();
-        return responseJson([],200);
+        return responseJsonSuccess();
     }
 
-    private function validationDTO ($request) {
-        return ProductDTO::fromRequest($request)->validatedData;
+    private function deleteImage($image) {
+        Storage::delete($image);
     }
+
 }

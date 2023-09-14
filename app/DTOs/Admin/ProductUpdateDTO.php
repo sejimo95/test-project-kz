@@ -4,7 +4,7 @@ namespace App\DTOs\Admin;
 
 use WendellAdriel\ValidatedDTO\ValidatedDTO;
 
-class ProductDTO extends ValidatedDTO
+class ProductUpdateDTO extends ValidatedDTO
 {
     /**
      * Defines the validation rules for the DTO.
@@ -12,6 +12,7 @@ class ProductDTO extends ValidatedDTO
     protected function rules(): array
     {
         return [
+            'id'             => ['required', 'int', 'exists:products,id'],
             'title'          => ['required', 'string', 'max:100'],
             'price'          => ['required', 'int', 'digits_between:1,20'],
             'description'    => ['required', 'string', 'max:5000'],
