@@ -14,22 +14,22 @@ Route::prefix('v1')->group(function () {
         Route::post('me', [AuthController::class, 'me']);
     });
 
-    Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->namespace('App\Http\Controllers\Api\V1')->group(function () {
         // user
-        Route::prefix('user')->group(function () {
-            Route::post('product', [ProductController::class, 'index']);
-
+        Route::prefix('user')->namespace('User')->group(function () {
+            Route::get('product', [ProductController::class, 'index']);
+            Route::apiResource('shopping-cart', 'ShoppingCartController');
         });
 
         // admin
         Route::prefix('admin')
-            ->namespace('App\Http\Controllers\Api\V1\Admin')
+            ->namespace('Admin')
             ->middleware('IsAdmin')
             ->group(function () {
                 Route::apiResource('product', 'ProductController');
                 Route::apiResource('category', 'CategoryController')
                     ->only(['index', 'store', 'destroy']);
-                Route::apiResource('sub_category', 'SubCategoryController')
+                Route::apiResource('sub-category', 'SubCategoryController')
                     ->only(['store', 'destroy']);
             });
     });

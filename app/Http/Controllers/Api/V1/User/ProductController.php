@@ -14,10 +14,10 @@ class ProductController extends Controller
         $dto = ProductDTO::fromRequest($request)->validatedData;
 
         // sortBy id OR price
-        $query = Product::orderBy($dto->sortBy, $dto->descending);
+        $query = Product::orderBy($dto['sortBy'], $dto['descending']);
 
         // search in [title, price, description]
-        $search = $dto->search;
+        $search = $dto['search'];
         if ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%")
@@ -27,8 +27,8 @@ class ProductController extends Controller
         }
 
         // filter by available
-        $available = $dto->available;
-        if ($available) {
+        $available = $dto['available'];
+        if (isset($available)) {
             $query->where('available', $available);
         }
 

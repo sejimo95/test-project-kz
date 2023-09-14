@@ -9,6 +9,7 @@ class SubCategory extends Model
 {
     use HasFactory;
     protected $table = 'sub_categories';
+    public $timestamps = false;
 
     protected $fillable = [
         'title',

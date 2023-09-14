@@ -4,7 +4,7 @@ namespace App\DTOs\User;
 
 use WendellAdriel\ValidatedDTO\ValidatedDTO;
 
-class ProductDTO extends ValidatedDTO
+class ShoppingCartDTO extends ValidatedDTO
 {
     /**
      * Defines the validation rules for the DTO.
@@ -12,10 +12,8 @@ class ProductDTO extends ValidatedDTO
     protected function rules(): array
     {
         return [
-            'sortBy'     => ['required', 'in:id,price'],
-            'descending' => ['required', 'in:asc,desc'],
-            'search'     => ['nullable'],
-            'available'  => ['nullable', 'in:0,1'],
+            'product_id' => ['required', 'int', 'exists:products,id'],
+            'count'      => ['required', 'int', 'max:100'],
         ];
     }
 
@@ -24,7 +22,9 @@ class ProductDTO extends ValidatedDTO
      */
     protected function defaults(): array
     {
-        return [];
+        return [
+            'user_id' => auth()->user()->id
+        ];
     }
 
     /**

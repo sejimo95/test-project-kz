@@ -2,9 +2,10 @@
 
 namespace App\DTOs\User;
 
+use Illuminate\Validation\Rule;
 use WendellAdriel\ValidatedDTO\ValidatedDTO;
 
-class ProductDTO extends ValidatedDTO
+class ShoppingCartDestroyDTO extends ValidatedDTO
 {
     /**
      * Defines the validation rules for the DTO.
@@ -12,10 +13,10 @@ class ProductDTO extends ValidatedDTO
     protected function rules(): array
     {
         return [
-            'sortBy'     => ['required', 'in:id,price'],
-            'descending' => ['required', 'in:asc,desc'],
-            'search'     => ['nullable'],
-            'available'  => ['nullable', 'in:0,1'],
+            'id' => ['required', 'int',
+                Rule::exists('shopping_cart', 'id')
+                    ->where('user_id', auth()->user()->id),
+            ]
         ];
     }
 

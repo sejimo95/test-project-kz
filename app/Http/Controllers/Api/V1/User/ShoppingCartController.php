@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1\User;
 
+use App\DTOs\User\ShoppingCartDestroyDTO;
+use App\DTOs\User\ShoppingCartDTO;
 use App\Http\Controllers\Controller;
+use App\Models\ShoppingCart;
 use Illuminate\Http\Request;
 
 class ShoppingCartController extends Controller
@@ -14,7 +17,12 @@ class ShoppingCartController extends Controller
      */
     public function index()
     {
-        //
+        $query = ShoppingCart::latest()
+            ->where('user_id', auth()->user()->id)
+            ->with('product')
+            ->get();
+
+        return responseJson(['date' => $query],200);
     }
 
     /**
@@ -25,30 +33,9 @@ class ShoppingCartController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+        $dto = ShoppingCartDTO::fromRequest($request)->validatedData;
+        ShoppingCart::create($dto);
+        return responseJsonSuccess();
     }
 
     /**
@@ -57,8 +44,11 @@ class ShoppingCartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        requestAddParam('shopping_cart');
+        $dto = ShoppingCartDestroyDTO::fromRequest($request)->validatedData;
+        ShoppingCart::findOrFail($dto['id'])->delete();
+        return responseJsonSuccess();
     }
 }
