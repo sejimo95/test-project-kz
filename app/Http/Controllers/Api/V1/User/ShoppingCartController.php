@@ -34,6 +34,14 @@ class ShoppingCartController extends Controller
     public function store(Request $request)
     {
         $dto = ShoppingCartDTO::fromRequest($request)->validatedData;
+
+        // check isset shopping cart
+        $checkIssetCart = ShoppingCart::where([['user_id', auth()->user()->id], ['product_id', $dto['product_id']]])
+            ->first();
+        if(isset($checkIssetCart)) {
+            return responseJsonError(['message' => 'This product is in your shopping cart.'], '403');
+        }
+
         ShoppingCart::create($dto);
         return responseJsonSuccess();
     }
